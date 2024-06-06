@@ -1,6 +1,23 @@
 Changelog
 =========
 
+0.5.0
+-----
+
+_2024-06-05_
+
+- Update to Kotlin `2.0.0`.
+- Update to KSP `2.0.0-1.0.22`.
+- Change `supportsK2` to true by default.
+- Change `disableStandardScript` to true by default. This doesn't seem to work reliably in K2 testing.
+- Update kapt class location references.
+- Support Kapt4 (AKA kapt.k2).
+- Support KSP2.
+- Introduce a new `KotlinCompilation.useKsp()` API to simplify KSP configuration.
+- Update to ClassGraph `4.8.173`.
+
+Note that in order to test Kapt 3 or KSP 1, you must now also set `languageVersion` to `1.9` in your `KotlinCompilation` configuration.
+
 0.4.1
 -----
 
