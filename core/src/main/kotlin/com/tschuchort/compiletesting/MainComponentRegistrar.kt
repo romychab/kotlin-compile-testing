@@ -17,12 +17,13 @@
 package com.tschuchort.compiletesting
 
 import com.google.auto.service.AutoService
-import org.jetbrains.kotlin.base.kapt3.KaptOptions
 import org.jetbrains.kotlin.com.intellij.mock.MockProject
 import org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar
 import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
+import org.jetbrains.kotlin.config.CommonConfigurationKeys.USE_FIR
 import org.jetbrains.kotlin.config.CompilerConfiguration
+import org.jetbrains.kotlin.kapt3.base.KaptOptions
 import org.jetbrains.kotlin.kapt3.base.incremental.IncrementalProcessor
 
 @ExperimentalCompilerApi
@@ -30,7 +31,7 @@ import org.jetbrains.kotlin.kapt3.base.incremental.IncrementalProcessor
 internal class MainComponentRegistrar : ComponentRegistrar, CompilerPluginRegistrar() {
 
   override val supportsK2: Boolean
-    get() = getThreadLocalParameters("supportsK2")?.supportsK2 ?: false
+    get() = getThreadLocalParameters("supportsK2")?.supportsK2 != false
 
   // Handle unset parameters gracefully because this plugin may be accidentally called by other tools that
   // discover it on the classpath (for example the kotlin jupyter kernel).
@@ -46,8 +47,8 @@ internal class MainComponentRegistrar : ComponentRegistrar, CompilerPluginRegist
   override fun ExtensionStorage.registerExtensions(configuration: CompilerConfiguration) {
     val parameters = getThreadLocalParameters("registerExtensions") ?: return
 
-    parameters.compilerPluginRegistrar.forEach { componentRegistrar ->
-      with(componentRegistrar) {
+    parameters.compilerPluginRegistrar.forEach { pluginRegistrar ->
+      with(pluginRegistrar) {
         registerExtensions(configuration)
       }
     }
@@ -68,8 +69,10 @@ internal class MainComponentRegistrar : ComponentRegistrar, CompilerPluginRegist
       componentRegistrar.registerProjectComponents(project, configuration)
     }
 
-    KaptComponentRegistrar(parameters.processors, parameters.kaptOptions)
-      .registerProjectComponents(project, configuration)
+    if (!configuration.getBoolean(USE_FIR)) {
+      KaptComponentRegistrar(parameters.processors, parameters.kaptOptions)
+        .registerProjectComponents(project, configuration)
+    }
   }
 
   companion object {

@@ -3,13 +3,14 @@ package com.tschuchort.compiletesting
 import org.jetbrains.kotlin.cli.common.arguments.K2JSCompilerArguments
 import org.jetbrains.kotlin.cli.js.K2JSCompiler
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
-import java.io.*
+import java.io.File
 
 @ExperimentalCompilerApi
 @Suppress("MemberVisibilityCanBePrivate")
 class KotlinJsCompilation : AbstractKotlinCompilation<K2JSCompilerArguments>() {
 
-  var outputFileName: String = "test.js"
+  @Deprecated("It is senseless to use with IR compiler. Only for compatibility.")
+  var outputFileName: String? = null
 
   /**
    * Generate unpacked KLIB into parent directory of output JS file. In combination with -meta-info
@@ -64,7 +65,9 @@ class KotlinJsCompilation : AbstractKotlinCompilation<K2JSCompilerArguments>() {
     args.noStdlib = true
 
     args.moduleKind = "commonjs"
-    args.outputFile = File(outputDir, outputFileName).absolutePath
+    outputFileName?.let {
+      args.outputFile = File(outputDir, it).absolutePath
+    }
     args.outputDir = outputDir.absolutePath
     args.sourceMapBaseDirs = jsClasspath().joinToString(separator = File.pathSeparator)
     args.libraries = listOfNotNull(kotlinStdLibJsJar).joinToString(separator = ":")

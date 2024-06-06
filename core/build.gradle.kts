@@ -19,12 +19,9 @@ buildConfig {
 }
 
 dependencies {
-    implementation(libs.autoService)
     ksp(libs.autoService.ksp)
 
-    testImplementation(libs.kotlinpoet)
-    testImplementation(libs.javapoet)
-
+    implementation(libs.autoService)
     implementation(libs.okio)
     implementation(libs.classgraph)
 
@@ -34,10 +31,12 @@ dependencies {
     testRuntimeOnly(libs.intellij.core)
     testRuntimeOnly(libs.intellij.util)
 
-    // The Kotlin compiler should be near the end of the list because its .jar file includes
-    // an obsolete version of Guava
     api(libs.kotlin.compilerEmbeddable)
     api(libs.kotlin.annotationProcessingEmbeddable)
+    api(libs.kotlin.kapt4)
+
+    testImplementation(libs.kotlinpoet)
+    testImplementation(libs.javapoet)
     testImplementation(libs.kotlin.junit)
     testImplementation(libs.mockito)
     testImplementation(libs.mockitoKotlin)
@@ -47,13 +46,12 @@ dependencies {
 tasks.withType<KotlinCompile>().configureEach {
     val isTest = name.contains("test", ignoreCase = true)
     compilerOptions {
-        freeCompilerArgs.addAll(
+        freeCompilerArgs.add(
             // https://github.com/tschuchortdev/kotlin-compile-testing/pull/63
-            "-Xno-optimized-callable-references",
-            "-Xskip-runtime-version-check",
+            "-Xno-optimized-callable-references"
         )
         if (isTest) {
-            freeCompilerArgs.add("-opt-in=org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi")
+            optIn.add("org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi")
         }
     }
 }

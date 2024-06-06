@@ -1,14 +1,28 @@
-name: Continuous Integration
+name: CI
 
-on: [ push, pull_request, workflow_dispatch ]
+on:
+  # Only run push on main
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**/*.md'
+  # Always run on PRs
+  pull_request:
+    branches: [ main ]
+
+concurrency:
+  group: 'ci-${{ github.event.merge_group.head_ref || github.head_ref }}-${{ github.workflow }}'
+  cancel-in-progress: true
 
 jobs:
   build:
-    name: Build
+    name: "${{ matrix.platform }}"
     runs-on: ${{ matrix.platform }}
     strategy:
+      fail-fast: false
       matrix:
-        platform: [ 'windows-latest', 'ubuntu-latest' ]
+        platform: [ 'windows-latest', 'ubuntu-latest', 'macos-latest' ]
     steps:
       - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4
 

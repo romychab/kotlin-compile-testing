@@ -7,13 +7,26 @@ import org.assertj.core.api.Assertions.assertThat
 import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
 import org.junit.Assert
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 import org.mockito.Mockito
 import java.net.URL
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.element.TypeElement
 
-class CompilerPluginsTest {
+@RunWith(Parameterized::class)
+class CompilerPluginsTest(
+    private val useK2: Boolean
+) {
+    companion object {
+        @Parameterized.Parameters(name = "useK2={0}")
+        @JvmStatic
+        fun data() = arrayOf(
+            arrayOf(true),
+            arrayOf(false)
+        )
+    }
 
     @Test
     fun `when compiler plugins are added they get executed`() {
@@ -21,7 +34,7 @@ class CompilerPluginsTest {
         val mockPlugin = Mockito.mock(ComponentRegistrar::class.java)
         val fakeRegistrar = FakeCompilerPluginRegistrar()
 
-        val result = defaultCompilerConfig().apply {
+        val result = defaultCompilerConfig(useK2).apply {
             sources = listOf(SourceFile.new("emptyKotlinFile.kt", ""))
             componentRegistrars = listOf(mockPlugin)
             compilerPluginRegistrars = listOf(fakeRegistrar)
@@ -61,7 +74,7 @@ class CompilerPluginsTest {
 					"""
         )
 
-        val result = defaultCompilerConfig().apply {
+        val result = defaultCompilerConfig(useK2).apply {
             sources = listOf(jSource)
             annotationProcessors = listOf(annotationProcessor)
             componentRegistrars = listOf(mockPlugin)

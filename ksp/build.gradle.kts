@@ -5,20 +5,25 @@ plugins {
   alias(libs.plugins.mavenPublish)
 }
 
-tasks.withType<KotlinCompile>()
+tasks
+  .withType<KotlinCompile>()
   .matching { it.name.contains("test", ignoreCase = true) }
   .configureEach {
-    compilerOptions {
-      freeCompilerArgs.add("-opt-in=org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi")
-    }
+    compilerOptions { optIn.add("org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi") }
   }
 
 dependencies {
-  compileOnly(libs.kotlin.compilerEmbeddable)
   api(projects.core)
-  compileOnly(libs.ksp.api)
+  api(libs.ksp.api)
+
   implementation(libs.ksp)
-  testImplementation(libs.ksp.api)
+  implementation(libs.ksp.commonDeps)
+  implementation(libs.ksp.aaEmbeddable)
+
+  testImplementation(libs.kotlinpoet.ksp)
+  testImplementation(libs.autoService) {
+    because("To test accessing inherited classpath symbols")
+  }
   testImplementation(libs.kotlin.junit)
   testImplementation(libs.mockito)
   testImplementation(libs.mockitoKotlin)
