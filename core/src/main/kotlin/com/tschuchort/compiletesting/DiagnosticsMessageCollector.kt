@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.facebook.buck.jvm.java.javax.com.tschuchort.compiletesting
+package com.tschuchort.compiletesting
 
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSourceLocation
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
-import javax.tools.Diagnostic
 
 /**
  * Custom message collector for Kotlin compilation that collects messages into
