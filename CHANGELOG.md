@@ -1,6 +1,15 @@
 Changelog
 =========
 
+0.5.1
+-----
+
+_2024-06-05_
+
+- **New**: Capture diagnostics with a severity level. This allows the output to be more easily filtered after the fact.
+
+Special thanks to [@evant](https://github.com/evant) for contributing to this release!
+
 0.5.0
 -----
 
